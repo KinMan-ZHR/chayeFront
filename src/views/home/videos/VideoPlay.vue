@@ -121,7 +121,7 @@ export default{
     },
 
     onClickVideo(e){
-      if(e.length!=0){
+      if(e.length!==0){
         var rowid = e[0]-1
         this.chosedVideo = this.videoList[rowid].link;
         let player = document.querySelector('#root')
@@ -150,7 +150,7 @@ export default{
       // ]
       await getVideoListAPI(useUserStore().userInfo.id).then(res=>{
         this.videoList=res.data.coredata.videoList;
-        if(this.chosedVideo.length!=0){
+        if(this.chosedVideo.length!==0){
           this.chosedVideo = this.videoList[0].link;
           this.processVideoListToFitTable()
         }

@@ -102,8 +102,8 @@
 
 <script>
 import { ref } from 'vue';
-import WenZhangVideo from './WenZhangVideo.vue';
-import WenZhang from './WenZhang.vue';
+import WenZhangVideo from '../../../../components/WenZhangVideo.vue';
+import WenZhang from '../../../../components/WenZhang.vue';
 import {getCharityVideoListAPI} from "@/apis/videoHandler";
 import {getAdPicListAPI} from "@/apis/adPicHandler";
 //已解决todo 将视频广告与图片广告合并简化代码，取消chunkArray函数,因为后端只返回相应的列表

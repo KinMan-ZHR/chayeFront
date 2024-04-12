@@ -2,7 +2,7 @@
     <div class="container" style="display: flex;justify-content: center;">
         <div>
             <div style="display: flex;margin-top: 24px;">
-                <div style="line-height: 32px;">管理头条</div>
+                <div style="line-height: 32px;">管理信息动态</div>
                 <div style="flex-grow: 1;"></div>
                 <div>
                     <t-button theme="primary" @click="onClickCreateItem">
@@ -15,7 +15,7 @@
                 <t-table
                 ref="tableRef"
                 row-key="id"
-                :data="headlineList"
+                :data="articleList"
                 :columns="columns"
                 :editable-row-keys="editableRowKeys"
                 :pagination="pagination"
@@ -36,10 +36,10 @@
             <template #header>
                 <div style="display:flex">
                     <span style="display:flex;align-items:center"><t-icon name="add"></t-icon></span>
-                    <span style="line-height:32px">新建头条新闻</span>
+                    <span style="line-height:32px">新建信息动态</span>
                 </div>
             </template>
-            <NewToutiao :add-method="addHeadline"/>
+            <NewXinxiDongtai :add-method="addArticle"/>
         </t-dialog>
     </div>
 </template>
@@ -48,12 +48,12 @@
 import { MessagePlugin,Input, DatePicker } from 'tdesign-vue-next';
 // eslint-disable-next-line no-unused-vars
 import {ref, computed, reactive, onMounted} from 'vue';
-import { useHeadlineManager } from '@/hooks/headlineManager';
-import NewToutiao from './NewToutiao.vue';
+import { useArticleManager } from '@/hooks/articleManager';
+import NewXinxiDongtai from './core/NewXinxiDongtai.vue';
 export default {
-    name: 'ManageWenMingToutiao',
-    components: {
-        NewToutiao,
+    name: 'ManageXinxiDongtai',
+    components:{
+        NewXinxiDongtai
     },
     setup() {
         //前端视图层数据
@@ -75,11 +75,11 @@ export default {
         });
 
         //使用hook，此乃接口核心，返回的是一个对象，包含了增删改查的方法，可以直接把row传入
-        let { headlineList, addHeadline, delHeadline, editHeadline,getHeadline }=useHeadlineManager(pageSize,current,total);
+        let { articleList, addArticle, delArticle, editArticle,getArticle } = useArticleManager(pageSize,current,total);
 
 
         const columns = computed(() =>[
-            { align: 'left', colKey: 'id', title: '头条ID', width: '120', fixed: 'left',
+            { align: 'left', colKey: 'id', title: '文章ID', width: '120', fixed: 'left',
                 // 编辑状态相关配置，全部集中在 edit
                 edit: {
                     // 1. 支持任意组件。需保证组件包含 `value` 和 `onChange` 两个属性，且 onChange 的第一个参数值为 new value。
@@ -106,26 +106,7 @@ export default {
                     showEditIcon: false,
                 },
             },
-
-            { colKey: 'image', title: '图片URL', width: '170' ,ellipsis:true,
-                edit: {
-                        // 1. 支持任意组件。需保证组件包含 `value` 和 `onChange` 两个属性，且 onChange 的第一个参数值为 new value。
-                        // 2. 如果希望支持校验，组件还需包含 `status` 和 `tips` 属性。具体 API 含义参考 Input 组件
-                        component: Input,
-                        // props, 透传全部属性到 Input 组件
-                        props: {
-                            clearable: true,
-                            autofocus: true,
-                            autoWidth: true,
-                        },
-                        // 校验规则，此处同 Form 表单
-                        rules: [
-                            { max: 500, message: '字符数量不能超过 500', type: 'warning' },
-                        ],
-                        showEditIcon: false,
-                    },
-            },
-            { colKey: 'time', title: '发布时间' ,width:'220px',
+            { colKey: 'time', title: '文章发布时间' ,width:'220px',
                 edit: {
                     component: DatePicker,
                     // props, 透传全部属性到 DatePicker 组件
@@ -133,22 +114,37 @@ export default {
                     showEditIcon: false,
                 },
             },
-            { colKey: 'source', title: '文章来源', width: '180',
+            { colKey: 'source', title: '文章来源', width: '120', ellipsis: true,
                 edit: {
-                    component: Input,
-                    props: {
-                        clearable: true,
-                        autofocus: true,
-                        autoWidth: true,
-                    },
-                    rules: [
-                        { max: 500, message: '字符数量不能超过 500', type: 'warning' },
-                        { required: true, message: '不能为空'},
-                    ],
-                    showEditIcon: false,
+                        component: Input,
+                        props: {
+                            clearable: true,
+                            autofocus: true,
+                            autoWidth: true,
+                        },
+                        rules:[
+                            { max: 500, message: '字符数量不能超过 500', type: 'warning' },
+                            { required: true, message: '不能为空'},
+                        ],
+                        showEditIcon: false,
                 },
             },
-            { colKey: 'text', title: '文章内容', width: '280', ellipsis: true,
+            { colKey: 'image', title: '图片链接', width: '280', ellipsis: true,
+                edit: {
+                        component: Input,
+                        props: {
+                            clearable: true,
+                            autofocus: true,
+                            autoWidth: true,
+                        },
+                        rules:[
+                            { max: 500, message: '字符数量不能超过 500', type: 'warning' },
+                            { required: true, message: '不能为空'},
+                        ],
+                        showEditIcon: false,
+                },
+            },
+            { colKey: 'text', title: '文章内容', width: '140', ellipsis: true,
                 edit: {
                         component: Input,
                         props: {
@@ -170,6 +166,7 @@ export default {
 
                     //判断是否属于修改行，如果是则显示保存和取消按钮，否则显示编辑和删除按钮
                     const editable = editableRowKeys.value.includes(row.id);
+                    console.log('editable:',editable);
                     return (
                     <t-space class="table-operations">
                         {!editable && (
@@ -201,66 +198,78 @@ export default {
                 fixed: 'right'
             },
         ]);
-      //console.log('headlineList:',headlineList.value);
+      //console.log('articleList:',articleList.value);
         // TODO：伪造数据开始
-        headlineList.value=[
-            {
-                id:'1',
-                title:'新闻标题1',
-                image:'https://desk-fd.zol-img.com.cn/t_s960x600c5/g5/M00/0D/0D/ChMkJ1eV_EiIckZnAAxoKo4d-a0AAT0gwJxjq4ADGhC893.jpg',
-                time:'2022-01-01',
-                source:'新华网',
-                text:'这是一条新闻',
-            },
-            {
-                id:'12',
-                title:'新闻标题1',
-                image:'https://desk-fd.zol-img.com.cn/t_s960x600c5/g5/M00/0D/0D/ChMkJ1eV_EiIckZnAAxoKo4d-a0AAT0gwJxjq4ADGhC893.jpg',
-                time:'2022-01-01',
-                source:'新华网',
-                text:'这是一条新闻',
-            },
-            {
-                id:'6',
-                title:'新闻标题1',
-                image:'https://desk-fd.zol-img.com.cn/t_s960x600c5/g5/M00/0D/0D/ChMkJ1eV_EiIckZnAAxoKo4d-a0AAT0gwJxjq4ADGhC893.jpg',
-                time:'2022-01-01',
-                source:'新华网',
-                text:'这是一条新闻',
-            },
-            {
-                id:'3',
-                title:'新闻标题1',
-                image:'https://desk-fd.zol-img.com.cn/t_s960x600c5/g5/M00/0D/0D/ChMkJ1eV_EiIckZnAAxoKo4d-a0AAT0gwJxjq4ADGhC893.jpg',
-                time:'2022-01-01',
-                source:'新华网',
-                text:'这是一条新闻',
-            },
-            {
-                id:'4',
-                title:'新闻标题1',
-                image:'https://desk-fd.zol-img.com.cn/t_s960x600c5/g5/M00/0D/0D/ChMkJ1eV_EiIckZnAAxoKo4d-a0AAT0gwJxjq4ADGhC893.jpg',
-                time:'2022-01-01',
-                source:'新华网',
-                text:'这是一条新闻',
-            },
+        // articleList.value=[
+        //     {
+        //         id:'1',
+        //         title:'新闻标题1',
+        //         time:'2022-01-01',
+        //         source:'2天',
+        //         image:'成都市',
+        //         text:'发你就哦啊为妇女',
+        //     },
+        //     {
+        //         id:'12',
+        //         title:'新闻标题1',
+        //         project_location:'哦哇饿u国会女啊我来干嘛',
+        //         time:'2022-01-01',
+        //         source:'2天',
+        //         image:'德阳市',
+        //         text:'发你就哦啊为妇女',
+        //     },
+        //     {
+        //         id:'6',
+        //         title:'新闻标题1',
+        //         project_location:'哦哇饿u国会女啊我来干嘛',
+        //         time:'2022-01-01',
+        //         source:'2天',
+        //         image:'绵阳市',
+        //         text:'发你就哦啊为妇女',
+        //     },
+        //     {
+        //         id:'3',
+        //         title:'新闻标题1',
+        //         project_location:'哦哇饿u国会女啊我来干嘛',
+        //         time:'2022-01-01',
+        //         source:'2天',
+        //         image:'广元市',
+        //         text:'发你就哦啊为妇女',
+        //     },
+        //     {
+        //         id:'4',
+        //         title:'新闻标题1',
+        //         project_location:'哦哇饿u国会女啊我来干嘛',
+        //         time:'2022-01-01',
+        //         source:'2天',
+        //         image:'宜宾市',
+        //         text:'发你就哦啊为妇女',
+        //     },
 
-        ];
+        // ];
         // TODO：伪造数据结束，请求相关开始
         const onConfirmDelete = async (row) =>{
+            // const { id } = e.currentTarget.dataset;
             console.log("confirmdelete",row.id);
-            await delHeadline(row)
-            const indexToDelete = headlineList.value.findIndex((item) => item.id === row.id);
+            // console.log('tableRef',tableRef.value);
+            // 移除当前节点
+            // tableRef.value.remove(row.id);
+            // TODO：根据indexToDelete获取用户id，根据用户id删除数据库的用户根据current和pageSize再次获取当前页面的数据,同时更新total的值（使用之前定义的articleNum）
+            await delArticle(row);
+            // ISSUE：前端效果实现逻辑在下面，后续可能要删掉
+            // 前端视图层删除元素，后端未必真删除
+           // 找到要删除的元素索引
+            const indexToDelete = articleList.value.findIndex((item) => item.id === row.id);
             console.log('要删除的索引是：',indexToDelete);
-            headlineList.value.splice(indexToDelete, 1);
-            console.log('删除后',headlineList);
+            articleList.value.splice(indexToDelete, 1);
+            console.log('删除后',articleList);
             MessagePlugin.success('删除成功');
         }
 
         const onEdit = (e) => {
             // Your onEdit logic...
             // console.log('onEdit:',e);
-          console.log('useList',headlineList.value);
+          console.log('useList',articleList.value);
           console.log('editableRowKeys',editableRowKeys.value);
           //console.log('editable',editable);
 
@@ -279,19 +288,20 @@ export default {
         current.value = params.current;
         pageSize.value = params.pageSize
         // TODO: 根据 current 和 pageSize 从数据库中切换页面数据...
-        getHeadline();
+        getArticle();
       }
       const onSave = async (e) => {
         // Your onSave logic...
         const { id } = e.currentTarget.dataset;
         currentSaveId.value = id;
+
         const current = editMap[currentSaveId.value];
         console.log('current:',current.editedRow);
 
         // 保存当前编辑行数据
-        await editHeadline(current.editedRow);
-
+        await editArticle(current.editedRow);
         updateEditState(currentSaveId.value);
+
       };
       //todo 请求相关结束
       //有点像组织修改额定数据存放到editMap中
@@ -329,23 +339,30 @@ export default {
             console.log('Event Table Row Validate:', params);
         };
 
+        const onClickCreateItem = () => {
+            add_visible.value=true;
+        };
+
         // 表格全量数据校验反馈事件，tableRef.value.validateTableData() 执行结束后触发
         function onValidate(params) {
             console.log('Event Table Data Validate:', params);
         }
 
 
-        const onClickCreateItem = () => {
-            add_visible.value=true;
-        };
+        // onMounted(()=>{
+        //     getArticle().then((res)=>{
+        //         console.log('articleList:',res.value);
+        //     })
+        //
+        // })
 
         return {
             editableRowKeys,
             columns,
-            headlineList,
-            editHeadline,
-            delHeadline,
-            addHeadline,
+            articleList,
+            editArticle,
+            delArticle,
+            addArticle,
             total,
             tableRef,
             currentSaveId,
@@ -356,11 +373,11 @@ export default {
             onSave,
             onRowEdit,
             pagination,
-            add_visible,
             onRowValidate,
             onValidate,
             onConfirmDelete,
             onChangePage,
+            add_visible,
             onClickCreateItem
         };
     },

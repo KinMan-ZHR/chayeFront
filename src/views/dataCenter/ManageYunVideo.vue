@@ -2,7 +2,7 @@
     <div class="container" style="display: flex;justify-content: center;">
         <div>
             <div style="display: flex;margin-top: 24px;">
-                <div style="line-height: 32px;">管理公益活动</div>
+                <div style="line-height: 32px;">管理云端视频</div>
                 <div style="flex-grow: 1;"></div>
                 <div>
                     <t-button theme="primary" @click="onClickCreateItem">
@@ -15,7 +15,7 @@
                 <t-table
                 ref="tableRef"
                 row-key="id"
-                :data="activityList"
+                :data="cloudVideoList"
                 :columns="columns"
                 :editable-row-keys="editableRowKeys"
                 :pagination="pagination"
@@ -36,24 +36,24 @@
             <template #header>
                 <div style="display:flex">
                     <span style="display:flex;align-items:center"><t-icon name="add"></t-icon></span>
-                    <span style="line-height:32px">新建公益活动</span>
+                    <span style="line-height:32px">新建云端视频</span>
                 </div>
             </template>
-            <NewGongyiHuodong :add-method="addActivity"/>
+            <NewYunVideo :add-method="addCloudVideo"/>
         </t-dialog>
     </div>
 </template>
 
 <script lang="jsx">
-import { MessagePlugin,Input, DatePicker } from 'tdesign-vue-next';
+import { MessagePlugin,Input, DatePicker, Select } from 'tdesign-vue-next';
 // eslint-disable-next-line no-unused-vars
 import {ref, computed, reactive, onMounted} from 'vue';
-import { useActivityManager } from '@/hooks/activityManager';
-import NewGongyiHuodong from './NewGongyiHuodong.vue';
+import { useCloudVideoManager } from '@/hooks/cloudVideoManager';
+import NewYunVideo from './core/NewYunVideo.vue';
 export default {
     name: 'ManageWenMingToutiao',
     components:{
-        NewGongyiHuodong
+        NewYunVideo
     },
     setup() {
         //前端视图层数据
@@ -75,11 +75,11 @@ export default {
         });
 
         //使用hook，此乃接口核心，返回的是一个对象，包含了增删改查的方法，可以直接把row传入
-        let { activityList, addActivity, delActivity, editActivity,getActivity }=useActivityManager(pageSize,current,total);
+        let { cloudVideoList, addCloudVideo, delCloudVideo, editCloudVideo,getCloudVideo }=useCloudVideoManager(pageSize,current,total);
 
 
         const columns = computed(() =>[
-            { align: 'left', colKey: 'id', title: '公益活动id', width: '120', fixed: 'left',
+            { align: 'left', colKey: 'id', title: '视频ID', width: '120', fixed: 'left',
                 // 编辑状态相关配置，全部集中在 edit
                 edit: {
                     // 1. 支持任意组件。需保证组件包含 `value` 和 `onChange` 两个属性，且 onChange 的第一个参数值为 new value。
@@ -93,7 +93,7 @@ export default {
                 },
             },
 
-            { align: 'left', colKey: 'title', title: '活动标题', width: '120',
+            { align: 'left', colKey: 'title', title: '视频标题', width: '120',
                 edit: {
                     component: Input,
                     props: {
@@ -106,7 +106,7 @@ export default {
                     showEditIcon: false,
                 },
             },
-            { colKey: 'time', title: '活动时间' ,width:'220px',
+            { colKey: 'date', title: '发布日期' ,width:'220px',
                 edit: {
                     component: DatePicker,
                     // props, 透传全部属性到 DatePicker 组件
@@ -114,7 +114,28 @@ export default {
                     showEditIcon: false,
                 },
             },
-            { colKey: 'source', title: '活动来源', width: '120', ellipsis: true,
+            { colKey: 'type', title: '视频类型', width: '140', ellipsis: true,
+                edit: {
+                        component: Select,
+                        props: {
+                            clearable: true,
+                            autofocus: true,
+                            autoWidth: true,
+                            options:[
+                                {label:'科教',value:'1'},
+                                {label:'记录',value:'2'},
+                                {label:'新闻',value:'3'},
+                                {label:'公益广告',value:'4'}
+                            ]
+                        },
+                        rules:[
+                            { max: 500, message: '字符数量不能超过 500', type: 'warning' },
+                            { required: true, message: '不能为空'},
+                        ],
+                        showEditIcon: false,
+                },
+            },
+            { colKey: 'link', title: '视频链接', width: '220', ellipsis: true,
                 edit: {
                         component: Input,
                         props: {
@@ -129,7 +150,7 @@ export default {
                         showEditIcon: false,
                 },
             },
-            { colKey: 'image', title: '活动图片', width: '280', ellipsis: true,
+            { colKey: 'cover', title: '视频封面', width: '280', ellipsis: true,
                 edit: {
                         component: Input,
                         props: {
@@ -144,7 +165,7 @@ export default {
                         showEditIcon: false,
                 },
             },
-            { colKey: 'text', title: '活动内容', width: '220', ellipsis: true,
+            { colKey: 'description', title: '视频简介', width: '220', ellipsis: true,
                 edit: {
                         component: Input,
                         props: {
@@ -198,55 +219,60 @@ export default {
                 fixed: 'right'
             },
         ]);
-      //console.log('activityList:',activityList.value);
+      //console.log('cloudVideoList:',cloudVideoList.value);
         // TODO：伪造数据开始
-        // activityList.value=[
-        //     {
-        //         id:'1',
-        //         title:'新闻标题1',
-        //         time:'2022-01-01',
-        //         source:'2天',
-        //         image:'成都市',
-        //         text:'发你就哦啊为妇女',
-        //     },
-        //     {
-        //         id:'12',
-        //         title:'新闻标题1',
-        //         project_location:'哦哇饿u国会女啊我来干嘛',
-        //         time:'2022-01-01',
-        //         source:'2天',
-        //         image:'德阳市',
-        //         text:'发你就哦啊为妇女',
-        //     },
-        //     {
-        //         id:'6',
-        //         title:'新闻标题1',
-        //         project_location:'哦哇饿u国会女啊我来干嘛',
-        //         time:'2022-01-01',
-        //         source:'2天',
-        //         image:'绵阳市',
-        //         text:'发你就哦啊为妇女',
-        //     },
-        //     {
-        //         id:'3',
-        //         title:'新闻标题1',
-        //         project_location:'哦哇饿u国会女啊我来干嘛',
-        //         time:'2022-01-01',
-        //         source:'2天',
-        //         image:'广元市',
-        //         text:'发你就哦啊为妇女',
-        //     },
-        //     {
-        //         id:'4',
-        //         title:'新闻标题1',
-        //         project_location:'哦哇饿u国会女啊我来干嘛',
-        //         time:'2022-01-01',
-        //         source:'2天',
-        //         image:'宜宾市',
-        //         text:'发你就哦啊为妇女',
-        //     },
+        cloudVideoList.value=[
+            {
+                id:'1',
+                title:'新闻标题1',
+                date:'2022-01-01',
+                type:'2天',
+                link:'bhgcvfytjh',
+                cover:'成都市',
+                description:'发你就哦啊为妇女',
+            },
+            {
+                id:'12',
+                title:'新闻标题1',
+                project_location:'哦哇饿u国会女啊我来干嘛',
+                date:'2022-01-01',
+                type:'2天',
+                link:'bhgcvfytjh',
+                cover:'德阳市',
+                description:'发你就哦啊为妇女',
+            },
+            {
+                id:'6',
+                title:'新闻标题1',
+                project_location:'哦哇饿u国会女啊我来干嘛',
+                date:'2022-01-01',
+                type:'2天',
+                link:'bhgcvfytjh',
+                cover:'绵阳市',
+                description:'发你就哦啊为妇女',
+            },
+            {
+                id:'3',
+                title:'新闻标题1',
+                project_location:'哦哇饿u国会女啊我来干嘛',
+                date:'2022-01-01',
+                type:'2天',
+                link:'bhgcvfytjh',
+                cover:'广元市',
+                description:'发你就哦啊为妇女',
+            },
+            {
+                id:'4',
+                title:'新闻标题1',
+                project_location:'哦哇饿u国会女啊我来干嘛',
+                date:'2022-01-01',
+                type:'2天',
+                link:'bhgcvfytjh',
+                cover:'宜宾市',
+                description:'发你就哦啊为妇女',
+            },
 
-        // ];
+        ];
         // TODO：伪造数据结束，请求相关开始
         const onConfirmDelete = async (row) =>{
             // const { id } = e.currentTarget.dataset;
@@ -254,22 +280,22 @@ export default {
             // console.log('tableRef',tableRef.value);
             // 移除当前节点
             // tableRef.value.remove(row.id);
-            // TODO：根据indexToDelete获取用户id，根据用户id删除数据库的用户根据current和pageSize再次获取当前页面的数据,同时更新total的值（使用之前定义的activityNum）
-            await delActivity(row);
+            // TODO：根据indexToDelete获取用户id，根据用户id删除数据库的用户根据current和pageSize再次获取当前页面的数据,同时更新total的值（使用之前定义的cloudVideoNum）
+            await delCloudVideo(row);
             // ISSUE：前端效果实现逻辑在下面，后续可能要删掉
             // 前端视图层删除元素，后端未必真删除
            // 找到要删除的元素索引
-            const indexToDelete = activityList.value.findIndex((item) => item.id === row.id);
+            const indexToDelete = cloudVideoList.value.findIndex((item) => item.id === row.id);
             console.log('要删除的索引是：',indexToDelete);
-            activityList.value.splice(indexToDelete, 1);
-            console.log('删除后',activityList);
+            cloudVideoList.value.splice(indexToDelete, 1);
+            console.log('删除后',cloudVideoList);
             MessagePlugin.success('删除成功');
         }
 
         const onEdit = (e) => {
             // Your onEdit logic...
             // console.log('onEdit:',e);
-          console.log('useList',activityList.value);
+          console.log('useList',cloudVideoList.value);
           console.log('editableRowKeys',editableRowKeys.value);
           //console.log('editable',editable);
 
@@ -288,9 +314,10 @@ export default {
         current.value = params.current;
         pageSize.value = params.pageSize
         // TODO: 根据 current 和 pageSize 从数据库中切换页面数据...
-        getActivity();
+        getCloudVideo();
       }
       const onSave = async (e) => {
+        // Your onSave logic...
         const { id } = e.currentTarget.dataset;
         currentSaveId.value = id;
 
@@ -298,10 +325,10 @@ export default {
         console.log('current:',current.editedRow);
 
         // 保存当前编辑行数据
-        await editActivity(current.editedRow);
-
+        await editCloudVideo(current.editedRow);
         updateEditState(currentSaveId.value);
       };
+
       //todo 请求相关结束
       //有点像组织修改额定数据存放到editMap中
       const onRowEdit = (params) => {
@@ -349,8 +376,8 @@ export default {
 
 
         // onMounted(()=>{
-        //     getActivity().then((res)=>{
-        //         console.log('activityList:',res.value);
+        //     getCloudVideo().then((res)=>{
+        //         console.log('cloudVideoList:',res.value);
         //     })
         //
         // })
@@ -358,10 +385,10 @@ export default {
         return {
             editableRowKeys,
             columns,
-            activityList,
-            editActivity,
-            delActivity,
-            addActivity,
+            cloudVideoList,
+            editCloudVideo,
+            delCloudVideo,
+            addCloudVideo,
             total,
             tableRef,
             currentSaveId,

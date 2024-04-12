@@ -49,7 +49,7 @@ import { MessagePlugin,Input, DatePicker, Select, RangeInput,DateRangePicker } f
 // eslint-disable-next-line no-unused-vars
 import {ref, computed, reactive, onMounted} from 'vue';
 import { useMapManager } from '@/hooks/mapManager';
-import NewZhiyuanProject from './NewZhiyuanProject.vue';
+import NewZhiyuanProject from '../../components/NewZhiyuanProject.vue';
 export default {
     name: 'ManageZhiYuanProject',
     components:{

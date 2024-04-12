@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import WenZhang from './WenZhang.vue';
+import WenZhang from '../../../../components/WenZhang.vue';
 import {getActivityListAPI} from "@/apis/activitiesHandler";
 export default{
     name:'XinXiDongTai',

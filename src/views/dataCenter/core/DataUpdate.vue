@@ -22,10 +22,10 @@
 
 <script>
 import { ref } from "vue";
-import ManageZhiYuan from './ManageZhiYuan.vue';
-import ManageWenMing from './ManageWenMing.vue';
-import ManageHuoDong from './ManageHuoDong.vue';
-import ManageXinXi from './ManageXinXi.vue';
+import ManageZhiYuan from '../ManageZhiYuan.vue';
+import ManageWenMing from '../ManageWenMing.vue';
+import ManageHuoDong from '../ManageHuoDong.vue';
+import ManageXinXi from '../ManageXinXi.vue';
 
 export default{
     name:'DataUpdate',

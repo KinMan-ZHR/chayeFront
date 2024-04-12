@@ -73,7 +73,7 @@
 
 
 <script  setup>
-import '../assets/css/index.css'
+import '../../../assets/css/index.css'
 import {useUserStore} from "@/dataStore/userdata";
 import {MessagePlugin} from "tdesign-vue-next";
 // eslint-disable-next-line no-unused-vars

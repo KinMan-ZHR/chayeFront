@@ -9,7 +9,7 @@
                 :data="userList"
                 :columns="columns"
                 :editable-row-keys="editableRowKeys"
-                :pagination="pagination"
+
                 table-layout="fixed"
                 bordered
                 resizable

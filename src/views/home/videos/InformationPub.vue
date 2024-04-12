@@ -129,12 +129,12 @@
 <script>
 // import DragVue from './DragVue.vue'
 // import { MoveIcon } from 'tdesign-icons-vue-next';
-import WenZhangVideo from './WenZhangVideo.vue'
+import WenZhangVideo from '../../../components/WenZhangVideo.vue'
 import {deleteVideoListAPI, getCloudVideoListAPI, getVideoListAPI, searchVideoListAPI, upLoadVideoAPI} from "@/apis/videoHandler";
 // eslint-disable-next-line no-unused-vars
 import UploadTest from "@/test/UploadTest.vue";
 import {useUserStore} from "@/dataStore/userdata";
-import EmptyBox from './EmptyBox.vue';
+import EmptyBox from '../../../components/EmptyBox.vue';
 
 
 
